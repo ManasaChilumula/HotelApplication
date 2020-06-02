@@ -1,0 +1,51 @@
+﻿<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: "Lato", sans-serif;
+        }
+
+        .sidenav {
+               height: 100%;
+    width: 200px;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: rgb(66, 133, 244);
+    overflow-x: auto;
+    padding-top: 80px;
+        }
+
+            .sidenav a {
+                padding: 6px 8px 6px 16px;
+                text-decoration: none;
+                font-size: 20px;
+    color: #ffffff;
+                display: block;
+            }
+
+                .sidenav a:hover {
+                    color: #f1f1f1;
+                }
+
+        .main {
+            margin-left: 160px; /* Same as the width of the sidenav */
+            font-size: 28px; /* Increased text to enable scrolling */
+            padding: 0px 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidenav">
+        <li>@Html.ActionLink("Custimer Register", "Index", "Home")</li>
+        <li>@Html.ActionLink("About", "About", "Home")</li>
+        <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+    </div>
+    </body>
+</html>
+
+
+

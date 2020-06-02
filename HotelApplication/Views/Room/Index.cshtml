@@ -1,0 +1,272 @@
+﻿@model HotelApplication.ViewModels.HotelViewModel
+
+<html>
+<head>
+  
+    @section Scripts {
+        @Scripts.Render("~/bundles/jqueryval")
+    }
+
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+
+
+    <script>
+        $(document).ready(function () {
+            alert("aaa");
+            //load Details
+            LoadroomDetails();
+            //Image file upload
+            var readURL = function (input) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        $('img').attr('src', e.target.result);
+                    }
+
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+
+
+            $(".file-upload").on('change', function () {
+                readURL(this);
+            });
+
+        });
+
+        function DeleteRoom(Roomid) {
+            alert(Roomid);
+            $.ajax({
+                async: true,
+                type: 'GET',
+                dataType: 'JSON',
+
+                data: { Roomid: Roomid },
+                url: '/Room/DeleteRoom',
+
+                success: function (data) {
+                    alert("Record Deleted");
+                    LoadroomDetails();
+
+                },
+                error: function () {
+                    alert("ajax error");
+                }
+            });
+        }
+      
+        function LoadroomDetails() {
+           //LoadroomDetails
+            $.ajax({
+                async: true,
+                type: 'GET',
+                dataType: 'HTML',
+                contentType: false,
+                url: '/Room/GetAllRoomDetails',
+                success: function (data) {
+                    $("#LoadroomDetails").html(data);
+                },
+                error: function () {
+                    alert("error");
+                }
+
+
+            });
+        }
+        function EditRoomId(Roomid) {
+            alert(Roomid);
+            $.ajax({
+                async: true,
+                type: 'GET',
+                dataType: 'JSON',
+
+                data: { Roomid: Roomid },
+                url: '/Room/EditRoomDetails',
+
+                success: function (data) {
+                  
+                    $("#RoomNumber").val(data.RoomNumber);
+                    $("#RoomPrice").val(data.RoomPrice);
+                    $("#ddBookingStatus").val(data.BookingStatusId);
+                    $("#ddRoomType").val(data.RoomTypeId);
+                    $("#RoomCapacity").val(data.RoomCapacity);
+                    $("#RoomDescription").val(data.RoomDescription);
+                    
+                    $("#RoomId").val(Roomid); 
+                    $("Img").attr('src', "../Images/"+ data.RoomImage);
+                    $("#SaveMethod").val("Update");
+                    $("#myModal").modal({ show: true });
+
+                },
+                error: function () {
+                    alert("ajax error");
+                }
+
+
+            });
+
+
+
+        }
+
+    </script>
+    <style>
+      
+        .upload-button {
+            padding: 4px;
+            border: 1px solid black;
+            border-radius: 5px;
+            display: block;
+            float: left;
+        }
+
+        .profile-pic {
+            max-width: 200px;
+            max-height: 200px;
+            display: block;
+        }
+
+        .file-upload {
+            display: none;
+        }
+
+        .modal-dialog {
+            position: static;
+        }
+
+        .modal-header {
+            background-color: #00b5ff;
+            color: white;
+        }
+
+        .btn-closeRed {
+            background-color: red;
+            color: white;
+        }
+
+        .img-thumbnail {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            object-position: center;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+     
+        <!-- Trigger the modal with a button -->
+        <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Room Booking</button>
+        <a class="btn btn-info btn-lg" href="@Url.Action("exportReport")">Dowload Reports</a>
+        <!-- Modal -->
+        <div class="modal fade" id="myModal" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Room Booking</h4>
+                    </div>
+                    
+                    <div class="modal-body">
+
+                        @using (Html.BeginForm("SaveRoomDetails", "Room", FormMethod.Post, new { enctype = "multipart/form-data"
+                        }))
+                        {
+                            @Html.AntiForgeryToken()
+
+                            <div class="form-horizontal">
+                              
+                                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                              <input type="hidden" name="RoomId" id="RoomId" value="" />
+                                <div class="form-group"> 
+                                    @Html.LabelFor(model => model.RoomNumber, htmlAttributes: new { @class = "control-label col-md-4"  })
+                                    <div class="col-md-8">
+                                        @Html.EditorFor(model => model.RoomNumber, new { htmlAttributes = new { @class = "form-control" } })
+                                        @Html.ValidationMessageFor(model => model.RoomNumber, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.RoomPrice, htmlAttributes: new { @class = "control-label col-md-4" })
+                                    <div class="col-md-8">
+                                        @Html.EditorFor(model => model.RoomPrice, new { htmlAttributes = new { @class = "form-control" } })
+                                        @Html.ValidationMessageFor(model => model.RoomPrice, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.BookingStatusId, htmlAttributes: new { @class = "control-label col-md-4" })
+                                    <div class="col-md-8">
+                                        @Html.DropDownListFor(model => model.BookingStatusId, Model.ListOfBookingStatus, "Booking Status", htmlAttributes: new { @class = "form-control", @id = "ddBookingStatus" })
+                                        @Html.ValidationMessageFor(model => model.BookingStatusId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.RoomTypeId, htmlAttributes: new { @class = "control-label col-md-4" })
+                                    <div class="col-md-8">
+                                        @Html.DropDownListFor(model => model.RoomTypeId, Model.ListOfRoomTypes, "Room Type ", htmlAttributes: new { @class = "form-control", @id = "ddRoomType" })
+                                        @Html.ValidationMessageFor(model => model.RoomTypeId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.RoomCapacity, htmlAttributes: new { @class = "control-label col-md-4" })
+                                    <div class="col-md-8">
+                                        @Html.EditorFor(model => model.RoomCapacity, new { htmlAttributes = new { @class = "form-control" } })
+                                        @Html.ValidationMessageFor(model => model.RoomCapacity, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.RoomDescription, htmlAttributes: new { @class = "control-label col-md-4" })
+                                    <div class="col-md-8">
+                                        @Html.EditorFor(model => model.RoomDescription, new { htmlAttributes = new { @class = "form-control"} })
+                                        @Html.ValidationMessageFor(model => model.RoomDescription, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.RoomImage, htmlAttributes: new { @class = "control-label col-md-4" })
+                                    <div class="col-md-8">
+                                        <input class="file-upload form-control" name="Image" id="UploadImage" type="file" accept="image/*" />
+                                        <img class="profile-pic" src="" width="100" height="100" , id="Img" />
+                                    </div>
+                                    </div>
+                             <div class="form-group">
+                                    <div class="col-md-offset-2 col-md-10">
+                                        <input  type="submit" value="Submit" class="btn btn-success" />
+                                        <button type="button" id="SaveMethod"class="btn btn-closeRed" data-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+
+                            </div>
+                         
+
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <div>
+        <div id="LoadroomDetails">
+
+        </div>
+    </div>
+
+</body>
+</html>
